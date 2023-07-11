@@ -34,8 +34,11 @@ function getUrl(origin: string, dest: string): string {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [origin, setOrigin] = React.useState('LDN');
-  const [dest, setDest] = React.useState('LDN');
+  const [origin, setOrigin] = React.useState('RYS');
+  const [dest, setDest] = React.useState('OXF');
+  const [deptTime, setDept] = React.useState('None');
+  const [arrTime, setArr] = React.useState('None');
+  const [duration, setDuration] = React.useState('None');
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest), {
@@ -45,7 +48,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       },
     });
     const jsonRes = await res.json();
-    console.log(jsonRes);
+    const journey = jsonRes["outboundJourneys"][0];
+    const deptTimeDate = new Date(journey["departureTime"]);
+    setDept(deptTimeDate.toLocaleTimeString('en-GB', { timeStyle: 'short' }));
+    const arrTimeDate = new Date(journey["arrivalTime"]);
+    setArr(arrTimeDate.toLocaleTimeString('en-GB', { timeStyle: 'short' }));
+
+    const duration = journey["journeyDurationInMinutes"];
+    setDuration(duration);
   };
 
   async function getLiveTimes() {
@@ -86,7 +96,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </List.Accordion>
         </List.Section>
       </View>
-      <Text style={styles.text}></Text>
+      <Text style={styles.text}>Departs: {deptTime}</Text>
+      <Text style={styles.text}>Arrives: {arrTime}</Text>
+      <Text style={styles.text}>{duration} Minutes</Text>
       <Button onPress={getTrainInfo}>Plan your journey</Button>
     </View>
   );
