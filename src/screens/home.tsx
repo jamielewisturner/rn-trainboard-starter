@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React from 'react';
 import { StyleSheet, View, Linking } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
 
@@ -22,16 +22,36 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
 });
+
 type OpenURLButtonProps = {
   url: string;
   children: string;
 };
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
+function getUrl(origin: string, dest: string): string {
+  return `https://mobile-api-softwire2.lner.co.uk/v1/fares?originStation=${origin}&destinationStation=${dest}&numberOfAdults=2&numberOfChildren=0&outboundDateTime=2023-07-24T14%3A30%3A00.000%2B01%3A00`;
+}
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [origin, setOrigin] = React.useState('LDN');
   const [dest, setDest] = React.useState('LDN');
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
+  const getTrainInfo = async () => {
+    const res = await fetch(getUrl(origin, dest), {
+      method: 'GET',
+      headers: {
+        'X-API-KEY': process.env.API_KEY,
+      },
+    });
+    const jsonRes = await res.json();
+    console.log(jsonRes);
+  };
+
+  async function getLiveTimes() {
+    const response = await fetch(getUrl(dest, origin));
+    console.log(JSON.stringify(response));
+  }
   return (
     <View style={styles.container}>
       <View style={styles.dropdownContainer}>
@@ -67,12 +87,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </List.Section>
       </View>
       <Text style={styles.text}></Text>
-      <Button onPress={async () => await Linking.openURL(getUrl(dest, origin))}>Plan your journey</Button>
+      <Button onPress={getTrainInfo}>Plan your journey</Button>
     </View>
   );
 };
-function getUrl(dest:string, origin:string):string{
-  return `https://www.lner.co.uk/travel-information/travelling-now/live-train-times/depart/${origin}/${dest}/#LiveDepResults`;
-}
 
 export default HomeScreen;
