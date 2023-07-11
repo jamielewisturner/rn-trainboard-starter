@@ -14,36 +14,61 @@ const styles = StyleSheet.create({
   text: {
     paddingBottom: 24,
   },
-  dropdown : {
-    width : '80%',
-    alignItems: 'center'
-  }
+  dropdown: {
+    width: 200,
+    alignItems: 'center',
+  },
+  dropdownContainer: {
+    flexDirection: 'row',
+  },
 });
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const [location, setLocation] = React.useState("LDN");
-
-  const stations = ["SOU", "RYS", "OXF", "RDG", "WRW"]
-  return (<View style={styles.container}>
-    <List.Section style={styles.dropdown}>
-      <List.Accordion
-      title="Dropdown"
-      >
-        {
-          stations.map(station => {
-            return <List.Item title={station} onPress={()=>{setLocation(station)}}/>
-          })
-        }
-      </List.Accordion>
-    </List.Section>
-    <Text style={styles.text}>{location}</Text>
-    <Button mode="contained" onPress={() => navigation.navigate('Details')}>
-      Go to details
-    </Button>
-  </View>);
-}
-  
+  const [origin, setOrigin] = React.useState('LDN');
+  const [dest, setDest] = React.useState('LDN');
+  const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
+  return (
+    <View style={styles.container}>
+      <View style={styles.dropdownContainer}>
+        <List.Section title="Origin">
+          <List.Accordion title={origin} style={styles.dropdown}>
+            {stations.map((station) => {
+              return (
+                <List.Item
+                  title={station}
+                  key={station}
+                  onPress={() => {
+                    setOrigin(station);
+                  }}
+                />
+              );
+            })}
+          </List.Accordion>
+        </List.Section>
+        <List.Section title="Destination">
+          <List.Accordion title={dest} style={styles.dropdown}>
+            {stations.map((station) => {
+              return (
+                <List.Item
+                  title={station}
+                  key={station}
+                  onPress={() => {
+                    setDest(station);
+                  }}
+                />
+              );
+            })}
+          </List.Accordion>
+        </List.Section>
+      </View>
+      <Text style={styles.text}></Text>
+      <Button mode="contained" onPress={() => navigation.navigate('Details')}>
+        Go to details
+      </Button>
+    </View>
+  );
+};
 
 export default HomeScreen;
