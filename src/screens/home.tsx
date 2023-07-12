@@ -43,11 +43,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [arrTime, setArr] = React.useState('None');
   const [duration, setDuration] = React.useState(0);
   const [selectedDeptTime, setSelDeptTime] = React.useState(
-    new Date(Date.now()).toTimeString(),
+    new Date().toTimeString(),
   );
-  const [selectedDeptDate, setSelDeptDate] = React.useState(
-    new Date(Date.now()),
-  );
+  const [selectedDeptDate, setSelDeptDate] = React.useState(new Date());
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
@@ -76,7 +74,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     ({ hours, minutes }) => {
       setTimePickerVisible(false);
       setSelDeptTime(`${hours}:${minutes}`);
-      console.log({ hours, minutes });
     },
     [setTimePickerVisible, setSelDeptTime],
   );
@@ -134,7 +131,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           visible={timePickerVisible}
           onDismiss={onDismissTimePicker}
           onConfirm={onConfirmTimePicker}
-          hours={12} // replace with current time
+          hours={12} // TODO: replace with current time
           minutes={14}
         />
         <Button onPress={() => setDatePickerVisible(true)}>
