@@ -1,8 +1,12 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
+import { StyleSheet, View, FlatList } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
+<<<<<<< HEAD
 import { TrainInfo,Journey } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
+=======
+import { TrainInfo, Journey } from '../models/trainInfo';
+>>>>>>> 52c01d6 (Making the code cleaner)
 import { ScreenNavigationProps } from '../routes';
 
 const styles = StyleSheet.create({
@@ -29,15 +33,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 8,
-    width : 300,
+    width: 300,
     marginHorizontal: 16,
   },
   button: {
     marginBottom: 30,
   },
 });
-
-
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
@@ -51,10 +53,14 @@ function getUrl(origin: string, dest: string): string {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [origin, setOrigin] = React.useState('RYS');
   const [dest, setDest] = React.useState('OXF');
+<<<<<<< HEAD
   const [selectedDepartureDate, setSelDepartDate] = React.useState(new Date());
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState([] as Journey[]);
+=======
+  const [journeys, setJourneys] = React.useState<Journey[]>([]);
+>>>>>>> 52c01d6 (Making the code cleaner)
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest), {
@@ -93,8 +99,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     });
     setDatePickerVisible(false);
   };
-
-  
 
   return (
     <View style={styles.container}>
@@ -164,23 +168,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           Departure date: {selectedDepartureDate.toDateString()}
         </Text>
       </View>
-      {
-        journeys &&
-        <FlatList data ={journeys}
-        renderItem={({item}) =>  
-        <View style = {styles.item}>      
-          <Text style={styles.text}>Departs: {new Date(item.departureTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
-          <Text style={styles.text}>Arrives: {new Date(item.arrivalTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
-          <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
-          {item.tickets.map((ticket) => {
-             return <Text style={styles.text}>{ticket.name} £{ticket.priceInPennies/100}</Text>
-          })}
-
-        </View> }
-      ></FlatList>
-      }
-        <Button style = {styles.button} onPress={getTrainInfo}>Plan your journey</Button>
-      
+      {journeys && (
+        <FlatList
+          data={journeys}
+          renderItem={({item}) =>  
+            <View style = {styles.item}>      
+              <Text style={styles.text}>Departs: {new Date(item.departureTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
+              <Text style={styles.text}>Arrives: {new Date(item.arrivalTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
+              <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
+              {item.tickets.map((ticket) => {
+                return (
+                  <Text style={styles.text}>
+                    {ticket.name} £{ticket.priceInPennies / 100}
+                  </Text>
+              )})};
+            </View>}
+        ></FlatList>
+      )}
+      <Button style={styles.button} onPress={getTrainInfo}>
+        Plan your journey
+      </Button>
     </View>
   );
 };
