@@ -1,8 +1,10 @@
-import React from 'react';
-import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
+import React, {Component} from 'react';
+import { StyleSheet, View } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
 import { TrainInfo } from '../models/trainInfo';
 import { ScreenNavigationProps } from '../routes';
+import RecycleTestComponent from '../components/sampleList';
+//import { DataProvider, LayoutProvider} from 'recyclerlistview';
 
 const styles = StyleSheet.create({
   container: {
@@ -25,15 +27,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 8,
-    width : 300,
+    width: 300,
     marginHorizontal: 16,
   },
   button: {
     marginBottom: 30,
   },
 });
-
-
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
@@ -57,11 +57,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       },
     });
     const trainInfo = await res.json() as TrainInfo;
-    
     setJourneys(trainInfo.outboundJourneys);
   };
 
-  
+  // const dataProvider = new DataProvider((r1, r2) => {
+  //   return r1 !== r2;
+  // });
+
+  // dataProvider.cloneWithRows([0, 1, 2, 3, 4, 5]);
+
+  // const layerProvider = new LayoutProvider(
+  //   (index) => index,
+  //   (type, dim) => {
+  //     dim.width = 100;
+  //     dim.height = 100;
+  //   },
+  // );
+  // console.log(dataProvider);
+  //   const rowRenderer = (type, data) => {
+  //   return (
+  //     <View>
+  //       <Text>Test</Text>
+  //     </View>
+  //   );
+  // };
 
   return (
     <View style={styles.container}>
@@ -97,7 +116,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </List.Accordion>
         </List.Section>
       </View>
-      {
+      {/* <RecyclerListView
+        style={{ width: 300, height: 800 }}
+        layoutProvider={layerProvider}
+        dataProvider={dataProvider}
+        rowRenderer={rowRenderer}
+      ></RecyclerListView> */}
+      {/* {
         journeys &&
         <FlatList data ={journeys}
         renderItem={({item}) =>  
@@ -111,9 +136,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
         </View> }
       ></FlatList>
-      }
-        <Button style = {styles.button} onPress={getTrainInfo}>Plan your journey</Button>
-      
+      } */}
+
+      <RecycleTestComponent journey={journeys}></RecycleTestComponent>
+
+      <Button style={styles.button} onPress={getTrainInfo}>Plan your journey</Button>
     </View>
   );
 };
