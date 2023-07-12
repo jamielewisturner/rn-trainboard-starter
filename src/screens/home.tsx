@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
-import { TrainInfo,Journey } from '../models/trainInfo';
+import { TrainInfo, Journey } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
 
@@ -61,7 +61,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         'X-API-KEY': process.env.API_KEY,
       },
     });
-    const trainInfo = await res.json() as TrainInfo;
+    const trainInfo = (await res.json()) as TrainInfo;
 
     setJourneys(trainInfo.outboundJourneys);
   };
@@ -163,18 +163,32 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {journeys && (
         <FlatList
           data={journeys}
-          renderItem={({item}) =>  
-            <View style = {styles.item}>      
-              <Text style={styles.text}>Departs: {new Date(item.departureTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
-              <Text style={styles.text}>Arrives: {new Date(item.arrivalTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
-              <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
+          renderItem={({ item }) => (
+            <View style={styles.item}>
+              <Text style={styles.text}>
+                Departs:{' '}
+                {new Date(item.departureTime).toLocaleTimeString('en-GB', {
+                  timeStyle: 'short',
+                })}
+              </Text>
+              <Text style={styles.text}>
+                Arrives:{' '}
+                {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
+                  timeStyle: 'short',
+                })}
+              </Text>
+              <Text style={styles.text}>
+                {item.journeyDurationInMinutes} Minutes
+              </Text>
               {item.tickets.map((ticket) => {
                 return (
-                  <Text style={styles.text}>
+                  <Text key={ticket.name} style={styles.text}>
                     {ticket.name} £{ticket.priceInPennies / 100}
                   </Text>
-              )})};
-            </View>}
+                );
+              })}
+            </View>
+          )}
         ></FlatList>
       )}
       <Button style={styles.button} onPress={getTrainInfo}>
