@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Linking } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
 import { TrainInfo, Journey } from '../trainInfo';
 import { ScreenNavigationProps } from '../routes';
@@ -23,10 +23,6 @@ const styles = StyleSheet.create({
   },
 });
 
-type OpenURLButtonProps = {
-  url: string;
-  children: string;
-};
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
 function getUrl(origin: string, dest: string): string {
@@ -58,10 +54,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setDuration(duration);
   };
 
-  async function getLiveTimes() {
-    const response = await fetch(getUrl(dest, origin));
-    console.log(JSON.stringify(response));
-  }
   return (
     <View style={styles.container}>
       <View style={styles.dropdownContainer}>
