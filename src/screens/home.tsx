@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Linking } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
-
+import { TrainInfo, Journey } from '../trainInfo';
 import { ScreenNavigationProps } from '../routes';
 
 const styles = StyleSheet.create({
@@ -38,7 +38,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [dest, setDest] = React.useState('OXF');
   const [deptTime, setDept] = React.useState('None');
   const [arrTime, setArr] = React.useState('None');
-  const [duration, setDuration] = React.useState('None');
+  const [duration, setDuration] = React.useState(0);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest), {
@@ -47,14 +47,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         'X-API-KEY': process.env.API_KEY,
       },
     });
-    const jsonRes = await res.json();
-    const journey = jsonRes["outboundJourneys"][0];
-    const deptTimeDate = new Date(journey["departureTime"]);
+    const jsonRes: TrainInfo = (await res.json()) as TrainInfo;
+    const journey: Journey = jsonRes.outboundJourneys[0];
+    const deptTimeDate = new Date(journey.departureTime);
     setDept(deptTimeDate.toLocaleTimeString('en-GB', { timeStyle: 'short' }));
-    const arrTimeDate = new Date(journey["arrivalTime"]);
+    const arrTimeDate = new Date(journey.arrivalTime);
     setArr(arrTimeDate.toLocaleTimeString('en-GB', { timeStyle: 'short' }));
 
-    const duration = journey["journeyDurationInMinutes"];
+    const duration = journey.journeyDurationInMinutes;
     setDuration(duration);
   };
 
