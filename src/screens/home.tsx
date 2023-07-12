@@ -42,10 +42,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [deptTime, setDept] = React.useState('None');
   const [arrTime, setArr] = React.useState('None');
   const [duration, setDuration] = React.useState(0);
-  const [selectedDeptTime, setSelDeptTime] = React.useState(
-    new Date().toTimeString(),
-  );
-  const [selectedDeptDate, setSelDeptDate] = React.useState(new Date());
+  const [selectedDepartureDate, setSelDepartDate] = React.useState(new Date());
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
@@ -66,28 +63,32 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const duration = journey.journeyDurationInMinutes;
     setDuration(duration);
   };
-  const onDismissTimePicker = React.useCallback(() => {
+  const onDismissTimePicker = () => {
     setTimePickerVisible(false);
-  }, [setTimePickerVisible]);
+  };
 
-  const onConfirmTimePicker = React.useCallback(
-    ({ hours, minutes }) => {
-      setTimePickerVisible(false);
-      setSelDeptTime(`${hours}:${minutes}`);
-    },
-    [setTimePickerVisible, setSelDeptTime],
-  );
-  const onDismissDatePicker = React.useCallback(() => {
+  const onConfirmTimePicker = ({ hours, minutes }) => {
+    setSelDepartDate((currentState) => {
+      currentState.setHours(hours, minutes);
+      return currentState;
+    });
+    setTimePickerVisible(false);
+  };
+  const onDismissDatePicker = () => {
     setDatePickerVisible(false);
-  }, [setDatePickerVisible]);
+  };
 
-  const onConfirmDatePicker = React.useCallback(
-    (params) => {
-      setSelDeptDate(params.date);
-      setDatePickerVisible(false);
-    },
-    [setDatePickerVisible, setSelDeptDate],
-  );
+  const onConfirmDatePicker = (params) => {
+    setSelDepartDate((currentState) => {
+      currentState.setFullYear(
+        params.date.getFullYear(),
+        params.date.getMonth(),
+        params.date.getDate(),
+      );
+      return currentState;
+    });
+    setDatePickerVisible(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -131,8 +132,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           visible={timePickerVisible}
           onDismiss={onDismissTimePicker}
           onConfirm={onConfirmTimePicker}
-          hours={12} // TODO: replace with current time
-          minutes={14}
+          hours={selectedDepartureDate.getHours()} // TODO: replace with current time
+          minutes={selectedDepartureDate.getMinutes()}
         />
         <Button onPress={() => setDatePickerVisible(true)}>
           Pick departure date
@@ -142,14 +143,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           mode="single"
           visible={datePickerVisible}
           onDismiss={onDismissDatePicker}
-          date={selectedDeptDate}
+          date={selectedDepartureDate}
           onConfirm={onConfirmDatePicker}
         />
       </View>
       <View style={styles.timeDatePicker}>
-        <Text style={styles.text}>Departure time: {selectedDeptTime}</Text>
         <Text style={styles.text}>
-          Departure date: {selectedDeptDate.toDateString()}
+          Departure time:{' '}
+          {selectedDepartureDate.toLocaleTimeString('en-GB', {
+            timeStyle: 'short',
+          })}
+        </Text>
+        <Text style={styles.text}>
+          Departure date: {selectedDepartureDate.toDateString()}
         </Text>
       </View>
       <Text style={styles.text}>Departs: {deptTime}</Text>
