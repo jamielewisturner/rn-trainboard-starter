@@ -1,7 +1,7 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
-import { TrainInfo } from '../models/trainInfo';
+import { TrainInfo,Journey } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
 
@@ -25,7 +25,19 @@ const styles = StyleSheet.create({
   timeDatePicker: {
     flexDirection: 'row',
   },
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
+    width : 300,
+    marginHorizontal: 16,
+  },
+  button: {
+    marginBottom: 30,
+  },
 });
+
+
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
@@ -33,18 +45,16 @@ function getUrl(origin: string, dest: string): string {
   if (!process.env.API_URL) {
     throw 'Missing env variable for API_URL';
   }
-  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=2&numberOfChildren=0&outboundDateTime=2023-07-24T14%3A30%3A00.000%2B01%3A00`;
+  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=2023-07-24T14%3A30%3A00.000%2B01%3A00`;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [origin, setOrigin] = React.useState('RYS');
   const [dest, setDest] = React.useState('OXF');
-  const [deptTime, setDept] = React.useState('None');
-  const [arrTime, setArr] = React.useState('None');
-  const [duration, setDuration] = React.useState(0);
   const [selectedDepartureDate, setSelDepartDate] = React.useState(new Date());
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
+  const [journeys, setJourneys] = React.useState([] as Journey[]);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest), {
@@ -53,15 +63,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         'X-API-KEY': process.env.API_KEY,
       },
     });
-    const jsonRes = (await res.json()) as TrainInfo;
-    const journey = jsonRes.outboundJourneys[0];
-    const deptTimeDate = new Date(journey.departureTime);
-    setDept(deptTimeDate.toLocaleTimeString('en-GB', { timeStyle: 'short' }));
-    const arrTimeDate = new Date(journey.arrivalTime);
-    setArr(arrTimeDate.toLocaleTimeString('en-GB', { timeStyle: 'short' }));
+    const trainInfo = await res.json() as TrainInfo;
 
-    const duration = journey.journeyDurationInMinutes;
-    setDuration(duration);
+    setJourneys(trainInfo.outboundJourneys);
   };
   const onDismissTimePicker = () => {
     setTimePickerVisible(false);
@@ -89,6 +93,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     });
     setDatePickerVisible(false);
   };
+
+  
 
   return (
     <View style={styles.container}>
@@ -158,10 +164,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           Departure date: {selectedDepartureDate.toDateString()}
         </Text>
       </View>
-      <Text style={styles.text}>Departs: {deptTime}</Text>
-      <Text style={styles.text}>Arrives: {arrTime}</Text>
-      <Text style={styles.text}>{duration} Minutes</Text>
-      <Button onPress={getTrainInfo}>Plan your journey</Button>
+      {
+        journeys &&
+        <FlatList data ={journeys}
+        renderItem={({item}) =>  
+        <View style = {styles.item}>      
+          <Text style={styles.text}>Departs: {new Date(item.departureTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
+          <Text style={styles.text}>Arrives: {new Date(item.arrivalTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
+          <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
+          {item.tickets.map((ticket) => {
+             return <Text style={styles.text}>{ticket.name} £{ticket.priceInPennies/100}</Text>
+          })}
+
+        </View> }
+      ></FlatList>
+      }
+        <Button style = {styles.button} onPress={getTrainInfo}>Plan your journey</Button>
+      
     </View>
   );
 };
