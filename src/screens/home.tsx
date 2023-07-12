@@ -1,12 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
-<<<<<<< HEAD
 import { TrainInfo,Journey } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
-=======
-import { TrainInfo, Journey } from '../models/trainInfo';
->>>>>>> 52c01d6 (Making the code cleaner)
 import { ScreenNavigationProps } from '../routes';
 
 const styles = StyleSheet.create({
@@ -53,14 +49,10 @@ function getUrl(origin: string, dest: string): string {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [origin, setOrigin] = React.useState('RYS');
   const [dest, setDest] = React.useState('OXF');
-<<<<<<< HEAD
   const [selectedDepartureDate, setSelDepartDate] = React.useState(new Date());
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState([] as Journey[]);
-=======
-  const [journeys, setJourneys] = React.useState<Journey[]>([]);
->>>>>>> 52c01d6 (Making the code cleaner)
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest), {
