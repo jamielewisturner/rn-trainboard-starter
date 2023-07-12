@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, SafeAreaView } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
-import { Journey, TrainInfo } from '../trainInfo';
+import { TrainInfo } from '../models/trainInfo';
 import { ScreenNavigationProps } from '../routes';
 
 const styles = StyleSheet.create({
@@ -38,7 +38,10 @@ const styles = StyleSheet.create({
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
 function getUrl(origin: string, dest: string): string {
-  return `https://mobile-api-softwire2.lner.co.uk/v1/fares?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=2023-07-24T14%3A30%3A00.000%2B01%3A00`;
+  if (!process.env.API_URL) {
+    throw 'Missing env variable for API_URL';
+  }
+  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=2&numberOfChildren=0&outboundDateTime=2023-07-24T14%3A30%3A00.000%2B01%3A00`;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
