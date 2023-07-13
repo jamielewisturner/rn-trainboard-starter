@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, FlatList } from 'react-native';
+import { StyleSheet, View, FlatList, ActivityIndicator } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
 import { TrainInfo, Journey } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
@@ -79,7 +79,9 @@ function getUrl(origin: string, dest: string, depDate: Date): string {
   if (!process.env.API_URL) {
     throw 'Missing env variable for API_URL';
   }
-  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=${depDate.toJSON()}`;
+  return `${
+    process.env.API_URL
+  }?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=${depDate.toJSON()}`;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
@@ -94,7 +96,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
+  const [loading, setLoading] = React.useState(false);
   const getTrainInfo = async () => {
+    setLoading(true);
     const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
       method: 'GET',
       headers: {
@@ -102,7 +106,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       },
     });
     const trainInfo = (await res.json()) as TrainInfo;
-
+    setLoading(false);
     setJourneys(trainInfo.outboundJourneys);
   };
   const onDismissTimePicker = () => {
@@ -118,7 +122,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
   const onDismissDatePicker = () => {
     setDatePickerVisible(false);
-    console.log("dismissed")
+    console.log('dismissed');
   };
 
   const onConfirmDatePicker = (params) => {
@@ -223,6 +227,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       >
         Plan your journey
       </Button>
+      {loading && (
+        <ActivityIndicator size="large" color="#fe4365"></ActivityIndicator>
+      )}
       {journeys && (
         <FlatList
           data={journeys}
