@@ -98,8 +98,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.dropdownContainer}>
-      <StationSearch title="Select Origin" result={origin}></StationSearch>
-      <StationSearch title="Select Destination" result={dest}></StationSearch>
+      <StationSearch title="Select Origin" setTarget={setOrigin}></StationSearch>
+      <StationSearch title="Select Destination" setTarget={setDest}></StationSearch>
       </View>
       <View style={styles.timeDatePicker}>
         <Button onPress={() => setTimePickerVisible(true)}>
@@ -166,6 +166,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
+      <Text>{dest}</Text>
       <Button style={styles.button} onPress={getTrainInfo}>
         Plan your journey
       </Button>

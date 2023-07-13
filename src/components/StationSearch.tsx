@@ -4,10 +4,32 @@ import { List, Searchbar } from 'react-native-paper';
 import stationJson from '../data/stations.json';
 import { Station } from '../models/trainInfo';
 
-const StationSearch = ({ title }) => {
+const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flexDirection: 'column',
+    margin: 10,
+  },
+  item: {
+    textAlign: 'center',
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+});
+
+type StationSearchProps = {
+  title: string;
+  setTarget: React.Dispatch<React.SetStateAction<string>>;
+};
+
+const StationSearch: React.FC<StationSearchProps> = ({ title, setTarget }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
   const [stations, setStations] = React.useState([] as Station[]);
   const [isSearching, setIsSearching] = React.useState(false);
+
   const onChangeSearch = (query: string) => {
     let possibleStations = stationJson.stations.filter((station) =>
       station.name.toLowerCase().startsWith(query.toLocaleLowerCase()),
@@ -31,7 +53,7 @@ const StationSearch = ({ title }) => {
         value={searchQuery}
         onFocus={() => setIsSearching(true)}
       ></Searchbar>
-      <List.Section style={styles.list}>
+      <List.Section>
         {isSearching &&
           stations.map((station) => {
             return (
@@ -42,6 +64,7 @@ const StationSearch = ({ title }) => {
                 onPress={() => {
                   setSearchQuery(station.name);
                   setIsSearching(false);
+                  setTarget(station.crs);
                 }}
               />
             );
@@ -53,21 +76,5 @@ const StationSearch = ({ title }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flexDirection: 'column',
-    margin: 10,
-  },
-  item: {
-    textAlign: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-});
 
 export default StationSearch;
