@@ -56,7 +56,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
-  //const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
+
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
       method: 'GET',
@@ -98,8 +98,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.dropdownContainer}>
-      <StationSearch title="Select Origin" setTarget={setOrigin}></StationSearch>
-      <StationSearch title="Select Destination" setTarget={setDest}></StationSearch>
+        <StationSearch
+          title="Select Origin"
+          setTarget={setOrigin}
+        ></StationSearch>
+        <StationSearch
+          title="Select Destination"
+          setTarget={setDest}
+        ></StationSearch>
       </View>
       <View style={styles.timeDatePicker}>
         <Button onPress={() => setTimePickerVisible(true)}>

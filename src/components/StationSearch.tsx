@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { List, Searchbar } from 'react-native-paper';
 import stationJson from '../data/stations.json';
 import { Station } from '../models/trainInfo';
@@ -27,7 +27,7 @@ type StationSearchProps = {
 
 const StationSearch: React.FC<StationSearchProps> = ({ title, setTarget }) => {
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [stations, setStations] = React.useState([] as Station[]);
+  const [stations, setStations] = React.useState<Station[]>([]);
   const [isSearching, setIsSearching] = React.useState(false);
 
   const onChangeSearch = (query: string) => {
