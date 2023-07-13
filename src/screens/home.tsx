@@ -6,34 +6,70 @@ import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
 
 const styles = StyleSheet.create({
-  container: {
+  page: {
     flex: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#c8c8a9',
     alignItems: 'center',
     justifyContent: 'center',
   },
   text: {
     paddingBottom: 24,
+    //paddingTop: 10,
+    fontSize: 15,
+  },
+  headerText: {
+    textAlign: 'center',
+    // color: '#fe4365',
+    //paddingLeft: 20,
+    //paddingRight: 5,
+    fontSize: 20,
+    paddingBottom: 10,
+    paddingTop: 10,
   },
   dropdown: {
-    width: 200,
+    width: 150,
     alignItems: 'center',
+    backgroundColor: '#83af9b',
+    color: '#000',
+    //borderRadius: 15,
+    overflow: "hidden",
+    backfaceVisibility: 'hidden',
+  },
+  singleDropdown: {
+    paddingLeft: 20,
+    paddingRight: 20,
+    color: '#c8c8a9',
   },
   dropdownContainer: {
     flexDirection: 'row',
+    paddingLeft: 5,
+    paddingRight: 5,
+    paddingBottom: 10,
+    color: '#c8c8a9',
   },
-  timeDatePicker: {
+  singleTimeDate: {
+    alignItems: 'center',
+    paddingLeft: 15,
+    paddingRight: 15,
+  },
+  timeDateContainer: {
     flexDirection: 'row',
   },
   item: {
-    backgroundColor: '#f9c2ff',
+    backgroundColor: '#fc9d9a', // '#fe4365',
     padding: 20,
     marginVertical: 8,
     width: 300,
     marginHorizontal: 16,
   },
-  button: {
-    marginBottom: 30,
+  pickTimeButton: {
+    marginBottom: 7,
+    borderColor: '#83af9b',
+    borderWidth: 2,
+  },
+  planJourneyButton: {
+    marginBottom: 20,
+    backgroundColor: '#fe4365',
   },
 });
 
@@ -49,7 +85,11 @@ function getUrl(origin: string, dest: string, depDate: Date): string {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [origin, setOrigin] = React.useState('RYS');
   const [dest, setDest] = React.useState('OXF');
-  const [selectedDepartureDate, setSelDepartDate] = React.useState(new Date());
+  const [selectedDepartureDate, setSelDepartDate] = React.useState(() => {
+    const dateNow: Date = new Date();
+    dateNow.setMinutes(dateNow.getMinutes() + 1);
+    return dateNow;
+  });
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
@@ -78,6 +118,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
   const onDismissDatePicker = () => {
     setDatePickerVisible(false);
+    console.log("dismissed")
   };
 
   const onConfirmDatePicker = (params) => {
@@ -93,9 +134,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.page}>
       <View style={styles.dropdownContainer}>
-        <List.Section title="Origin">
+        <List.Section style={styles.singleDropdown}>
+          <Text style={styles.headerText}>Origin</Text>
           <List.Accordion title={origin} style={styles.dropdown}>
             {stations.map((station) => {
               return (
@@ -110,7 +152,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             })}
           </List.Accordion>
         </List.Section>
-        <List.Section title="Destination">
+        <List.Section style={styles.singleDropdown}>
+          <Text style={styles.headerText}>Destination</Text>
           <List.Accordion title={dest} style={styles.dropdown}>
             {stations.map((station) => {
               return (
@@ -126,40 +169,60 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </List.Accordion>
         </List.Section>
       </View>
-      <View style={styles.timeDatePicker}>
-        <Button onPress={() => setTimePickerVisible(true)}>
-          Pick departure time
-        </Button>
-        <TimePickerModal
-          visible={timePickerVisible}
-          onDismiss={onDismissTimePicker}
-          onConfirm={onConfirmTimePicker}
-          hours={selectedDepartureDate.getHours()} // TODO: replace with current time
-          minutes={selectedDepartureDate.getMinutes()}
-        />
-        <Button onPress={() => setDatePickerVisible(true)}>
-          Pick departure date
-        </Button>
-        <DatePickerModal
-          locale="en"
-          mode="single"
-          visible={datePickerVisible}
-          onDismiss={onDismissDatePicker}
-          date={selectedDepartureDate}
-          onConfirm={onConfirmDatePicker}
-        />
+      <View style={styles.timeDateContainer}>
+        <View style={styles.singleTimeDate}>
+          <Button
+            style={styles.pickTimeButton}
+            onPress={() => setTimePickerVisible(true)}
+            mode="outlined"
+            compact={true}
+            color="#111"
+          >
+            Departure time
+          </Button>
+          <Text style={styles.text}>
+            {selectedDepartureDate.toLocaleTimeString('en-GB', {
+              timeStyle: 'short',
+            })}
+          </Text>
+          <TimePickerModal
+            visible={timePickerVisible}
+            onDismiss={onDismissTimePicker}
+            onConfirm={onConfirmTimePicker}
+            hours={selectedDepartureDate.getHours()}
+            minutes={selectedDepartureDate.getMinutes()}
+          />
+        </View>
+        <View style={styles.singleTimeDate}>
+          <Button
+            style={styles.pickTimeButton}
+            onPress={() => setDatePickerVisible(true)}
+            mode="outlined"
+            compact={true}
+            color="#111"
+          >
+            Departure date
+          </Button>
+          <Text style={styles.text}>
+            {selectedDepartureDate.toDateString()}
+          </Text>
+          <DatePickerModal
+            locale="en"
+            mode="single"
+            visible={datePickerVisible}
+            onDismiss={onDismissDatePicker}
+            date={selectedDepartureDate}
+            onConfirm={onConfirmDatePicker}
+          />
+        </View>
       </View>
-      <View style={styles.timeDatePicker}>
-        <Text style={styles.text}>
-          Departure time:{' '}
-          {selectedDepartureDate.toLocaleTimeString('en-GB', {
-            timeStyle: 'short',
-          })}
-        </Text>
-        <Text style={styles.text}>
-          Departure date: {selectedDepartureDate.toDateString()}
-        </Text>
-      </View>
+      <Button
+        style={styles.planJourneyButton}
+        onPress={getTrainInfo}
+        mode="contained"
+      >
+        Plan your journey
+      </Button>
       {journeys && (
         <FlatList
           data={journeys}
@@ -191,9 +254,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
-      <Button style={styles.button} onPress={getTrainInfo}>
-        Plan your journey
-      </Button>
     </View>
   );
 };

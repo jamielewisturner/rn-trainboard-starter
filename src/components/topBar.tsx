@@ -10,13 +10,16 @@ const styles = StyleSheet.create({
   title: {
     alignSelf: 'center',
   },
+  topbar: {
+    backgroundColor: '#fe4365',
+  },
   backButton: {
     position: 'absolute',
   },
 });
 
 const TopBar: React.FC<TopBarProps> = ({ navigation, progress }) => (
-  <Appbar.Header>
+  <Appbar.Header style={styles.topbar}>
     {progress.previous && (
       <Appbar.BackAction
         style={styles.backButton}
