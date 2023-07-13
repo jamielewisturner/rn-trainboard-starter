@@ -68,7 +68,9 @@ function RecycleList(props: RecycleListProps) {
   }
 
   useEffect(() => {
-    setDataProvider(dataProvider.cloneWithRows(props.journeys));
+    setDataProvider((currentState) =>
+      currentState.cloneWithRows(props.journeys),
+    );
   }, [props.journeys]);
 
   return (
