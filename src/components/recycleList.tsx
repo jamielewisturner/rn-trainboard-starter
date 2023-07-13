@@ -1,11 +1,12 @@
-import React from 'react';
-import { View, Text, Dimensions, StyleSheet } from 'react-native';
+import React, { Component } from 'react';
 import {
   RecyclerListView,
   DataProvider,
   LayoutProvider,
 } from 'recyclerlistview';
 import { Journey } from '../models/trainInfo';
+
+import { View, Text, StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   item: {
     backgroundColor: '#f9c2ff',
@@ -19,73 +20,88 @@ const styles = StyleSheet.create({
   },
 });
 
-interface Props {
-  journey: Journey[];
+interface RecycleListProps {
+  journeys: Journey[];
 }
 
-export default class RecycleTestComponent extends React.Component<Props> {
-  private layoutProvider: LayoutProvider;
-  private dataProvider: DataProvider;
+interface RecycleListState {
+  dataProvider: DataProvider;
+}
 
-  constructor(props: Props) {
+class RecycleList extends Component<RecycleListProps, RecycleListState> {
+  constructor(props: RecycleListProps) {
     super(props);
-    const { width } = Dimensions.get('window');
-    this.dataProvider = new DataProvider((value1: Journey, value2: Journey) => {
-      return value1 !== value2;
-    });
-
-    this.layoutProvider = new LayoutProvider(
-      (index) => {
-        return index;
-      },
-      (type, dim) => {
-        dim.width = width / 2;
-        dim.height = 160;
-      },
-    );
-
-    this.rowRenderer = this.rowRenderer.bind(this);
-
-    const journeys = this.props.journey;
-
-    this.dataProvider.cloneWithRows(journeys);
+    this.state = {
+      dataProvider: new DataProvider((r1, r2) => r1 !== r2).cloneWithRows(
+        props.journeys,
+      ),
+    };
   }
 
-  rowRenderer(type, item: Journey) {
-    return (
-      <View style={styles.item}>
-        <Text style={styles.text}>
-          Departs:{' '}
-          {new Date(item.departureTime).toLocaleTimeString('en-GB', {
-            timeStyle: 'short',
-          })}
-        </Text>
-        <Text style={styles.text}>
-          Arrives:{' '}
-          {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
-            timeStyle: 'short',
-          })}
-        </Text>
-        <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
-        {item.tickets.map((ticket) => {
-          return (
-            <Text key={ticket.name} style={styles.text}>
-              {ticket.name} £{ticket.priceInPennies / 100}
-            </Text>
-          );
-        })}
-      </View>
-    );
+  componentDidUpdate(prevProps: RecycleListProps) {
+    if (prevProps.journeys !== this.props.journeys) {
+      this.updateDataProvider();
+    }
+  }
+
+  updateDataProvider() {
+    const { journeys: data } = this.props;
+    const { dataProvider } = this.state;
+    const newDataProvider = dataProvider.cloneWithRows(data);
+    this.setState({ dataProvider: newDataProvider });
   }
 
   render() {
+    const { dataProvider } = this.state;
+
+    const layoutProvider = new LayoutProvider(
+      (index) => {
+        return 'Default';
+      },
+      (type, dim) => {
+        dim.width = window.innerWidth;
+        dim.height = 300;
+      },
+    );
+
+    function rowRenderer(type, item: Journey) {
+      return (
+        <View style={styles.item}>
+          <Text style={styles.text}>
+            Departs:{' '}
+            {new Date(item.departureTime).toLocaleTimeString('en-GB', {
+              timeStyle: 'short',
+            })}
+          </Text>
+          <Text style={styles.text}>
+            Arrives:{' '}
+            {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
+              timeStyle: 'short',
+            })}
+          </Text>
+          <Text style={styles.text}>
+            {item.journeyDurationInMinutes} Minutes
+          </Text>
+          {item.tickets.map((ticket) => {
+            return (
+              <Text key={ticket.name} style={styles.text}>
+                {ticket.name} £{ticket.priceInPennies / 100}
+              </Text>
+            );
+          })}
+        </View>
+      );
+    }
+
     return (
       <RecyclerListView
-        style={{ width: 200, height: 800 }}
-        layoutProvider={this.layoutProvider}
-        dataProvider={this.dataProvider}
-        rowRenderer={this.rowRenderer}
+        layoutProvider={layoutProvider}
+        dataProvider={dataProvider}
+        style={{ width: 300, height: 200 }}
+        rowRenderer={rowRenderer}
       />
     );
   }
 }
+
+export default RecycleList;

@@ -4,6 +4,7 @@ import { Button, List } from 'react-native-paper';
 import { TrainInfo } from '../models/trainInfo';
 import { ScreenNavigationProps } from '../routes';
 import RecycleTestComponent from '../components/recycleList';
+import RecycleList from '../components/recycleList';
 //import { DataProvider, LayoutProvider} from 'recyclerlistview';
 
 const styles = StyleSheet.create({
@@ -95,7 +96,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         </List.Section>
       </View>
 
-      <RecycleTestComponent journey={journeys}></RecycleTestComponent>
+      {
+        //Render if list non-empty
+        journeys.length > 0 && <RecycleList journeys={journeys}></RecycleList>
+      }
 
       <Button style={styles.button} onPress={getTrainInfo}>Plan your journey</Button>
     </View>
