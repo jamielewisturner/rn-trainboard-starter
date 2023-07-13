@@ -4,6 +4,7 @@ import { Text, Button, List } from 'react-native-paper';
 import { TrainInfo, Journey } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
+import StationSearch from '../components/StationSearch';
 
 const styles = StyleSheet.create({
   page: {
@@ -110,6 +111,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const [loading, setLoading] = React.useState(false);
+
   const getTrainInfo = async () => {
     setLoading(true);
     const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
@@ -185,6 +187,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             })}
           </List.Accordion>
         </List.Section>
+        <StationSearch
+          title="Select Origin"
+          setTarget={setOrigin}
+        ></StationSearch>
+        <StationSearch
+          title="Select Destination"
+          setTarget={setDest}
+        ></StationSearch>
       </View>
       <View style={styles.timeDateContainer}>
         <View style={styles.singleTimeDate}>
@@ -280,6 +290,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
+      <Text>{dest}</Text>
+      <Button style={styles.button} onPress={getTrainInfo}>
+        Plan your journey
+      </Button>
     </View>
   );
 };

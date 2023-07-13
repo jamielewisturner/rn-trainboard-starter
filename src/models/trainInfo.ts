@@ -31,3 +31,7 @@ export type Location = {
 export type Operator = {
   name: string;
 };
+export type Station = {
+  name: string;
+  crs: string;
+};
