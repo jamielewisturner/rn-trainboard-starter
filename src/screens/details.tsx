@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Button, Text } from 'react-native-paper';
+import { ScreenNavigationProps } from '../routes';
 
 const styles = StyleSheet.create({
   container: {
@@ -9,11 +10,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  backButton: {
+    borderColor: '#83af9b',
+  },
 });
 
-const DetailsScreen: React.FC = () => (
+type DetailScreenProps = ScreenNavigationProps<'Details'>
+
+const DetailsScreen: React.FC<DetailScreenProps> = ({ navigation }) => (
   <View style={styles.container}>
     <Text>Details Screen</Text>
+    <Button
+      style={styles.backButton}
+      onPress={() => navigation.navigate('Home')}
+      mode="contained"
+    ></Button>
   </View>
 );
 

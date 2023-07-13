@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#83af9b',
     color: '#000',
     //borderRadius: 15,
-    overflow: "hidden",
+    overflow: 'hidden',
     backfaceVisibility: 'hidden',
   },
   singleDropdown: {
@@ -70,6 +70,19 @@ const styles = StyleSheet.create({
   planJourneyButton: {
     marginBottom: 20,
     backgroundColor: '#fe4365',
+  },
+  journeyBriefInfo: {
+    backgroundColor: '#fc9d9a',
+    width: 300,
+    marginBottom: 10,
+    marginTop: 10,
+    borderRadius: 10,
+    //paddingLeft: 0,
+  },
+  journeyInfoText: {
+    paddingBottom: 8,
+    //paddingTop: 10,
+    fontSize: 12,
   },
 });
 
@@ -234,30 +247,36 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         <FlatList
           data={journeys}
           renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text style={styles.text}>
-                Departs:{' '}
-                {new Date(item.departureTime).toLocaleTimeString('en-GB', {
-                  timeStyle: 'short',
+            <Button
+              style={styles.journeyBriefInfo}
+              onPress={() => navigation.navigate('Details')}
+              mode="contained"
+            >
+              <View style={styles.journeyBriefInfo}>
+                <Text style={styles.journeyInfoText}>
+                  Departs:{' '}
+                  {new Date(item.departureTime).toLocaleTimeString('en-GB', {
+                    timeStyle: 'short',
+                  })}
+                </Text>
+                <Text style={styles.journeyInfoText}>
+                  Arrives:{' '}
+                  {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
+                    timeStyle: 'short',
+                  })}
+                </Text>
+                <Text style={styles.journeyInfoText}>
+                  {item.journeyDurationInMinutes} Minutes
+                </Text>
+                {item.tickets.map((ticket) => {
+                  return (
+                    <Text key={ticket.name} style={styles.journeyInfoText}>
+                      {ticket.name} £{ticket.priceInPennies / 100}
+                    </Text>
+                  );
                 })}
-              </Text>
-              <Text style={styles.text}>
-                Arrives:{' '}
-                {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
-                  timeStyle: 'short',
-                })}
-              </Text>
-              <Text style={styles.text}>
-                {item.journeyDurationInMinutes} Minutes
-              </Text>
-              {item.tickets.map((ticket) => {
-                return (
-                  <Text key={ticket.name} style={styles.text}>
-                    {ticket.name} £{ticket.priceInPennies / 100}
-                  </Text>
-                );
-              })}
-            </View>
+              </View>
+            </Button>
           )}
         ></FlatList>
       )}
