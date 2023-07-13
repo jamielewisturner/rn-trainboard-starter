@@ -39,11 +39,11 @@ const styles = StyleSheet.create({
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
 
-function getUrl(origin: string, dest: string): string {
+function getUrl(origin: string, dest: string, depDate: Date): string {
   if (!process.env.API_URL) {
     throw 'Missing env variable for API_URL';
   }
-  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=2023-07-24T14%3A30%3A00.000%2B01%3A00`;
+  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=${depDate.toJSON()}`;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
@@ -55,7 +55,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
-    const res = await fetch(getUrl(origin, dest), {
+    const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
       method: 'GET',
       headers: {
         'X-API-KEY': process.env.API_KEY,
