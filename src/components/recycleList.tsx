@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { View, Text, Dimensions, StyleSheet } from 'react-native';
 import {
   RecyclerListView,
@@ -24,16 +24,17 @@ interface Props {
 }
 
 export default class RecycleTestComponent extends React.Component<Props> {
-  private _layoutProvider: LayoutProvider;
+  private layoutProvider: LayoutProvider;
+  private dataProvider: DataProvider;
+
   constructor(props: Props) {
     super(props);
-
     const { width } = Dimensions.get('window');
-    const dataProvider = new DataProvider((r1, r2) => {
-      return r1 !== r2;
+    this.dataProvider = new DataProvider((value1: Journey, value2: Journey) => {
+      return value1 !== value2;
     });
 
-    this._layoutProvider = new LayoutProvider(
+    this.layoutProvider = new LayoutProvider(
       (index) => {
         return index;
       },
@@ -43,19 +44,14 @@ export default class RecycleTestComponent extends React.Component<Props> {
       },
     );
 
-    this._rowRenderer = this._rowRenderer.bind(this);
+    this.rowRenderer = this.rowRenderer.bind(this);
 
     const journeys = this.props.journey;
 
-    //Since component should always render once data has changed, make data provider part of the state
-    this.state = {
-      dataProvider: dataProvider.cloneWithRows(journeys),
-    };
+    this.dataProvider.cloneWithRows(journeys);
   }
 
-  //Given type and data return the view component
-  _rowRenderer(type, item: Journey) {
-    //You can return any view here, CellContainer has no special significance
+  rowRenderer(type, item: Journey) {
     return (
       <View style={styles.item}>
         <Text style={styles.text}>
@@ -73,7 +69,7 @@ export default class RecycleTestComponent extends React.Component<Props> {
         <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
         {item.tickets.map((ticket) => {
           return (
-            <Text style={styles.text}>
+            <Text key={ticket.name} style={styles.text}>
               {ticket.name} £{ticket.priceInPennies / 100}
             </Text>
           );
@@ -86,9 +82,9 @@ export default class RecycleTestComponent extends React.Component<Props> {
     return (
       <RecyclerListView
         style={{ width: 200, height: 800 }}
-        layoutProvider={this._layoutProvider}
-        dataProvider={this.state.dataProvider}
-        rowRenderer={this._rowRenderer}
+        layoutProvider={this.layoutProvider}
+        dataProvider={this.dataProvider}
+        rowRenderer={this.rowRenderer}
       />
     );
   }

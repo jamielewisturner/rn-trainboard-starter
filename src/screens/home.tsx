@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text, Button, List } from 'react-native-paper';
+import { Button, List } from 'react-native-paper';
 import { TrainInfo } from '../models/trainInfo';
 import { ScreenNavigationProps } from '../routes';
-import RecycleTestComponent from '../components/sampleList';
+import RecycleTestComponent from '../components/recycleList';
 //import { DataProvider, LayoutProvider} from 'recyclerlistview';
 
 const styles = StyleSheet.create({
@@ -60,28 +60,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setJourneys(trainInfo.outboundJourneys);
   };
 
-  // const dataProvider = new DataProvider((r1, r2) => {
-  //   return r1 !== r2;
-  // });
-
-  // dataProvider.cloneWithRows([0, 1, 2, 3, 4, 5]);
-
-  // const layerProvider = new LayoutProvider(
-  //   (index) => index,
-  //   (type, dim) => {
-  //     dim.width = 100;
-  //     dim.height = 100;
-  //   },
-  // );
-  // console.log(dataProvider);
-  //   const rowRenderer = (type, data) => {
-  //   return (
-  //     <View>
-  //       <Text>Test</Text>
-  //     </View>
-  //   );
-  // };
-
   return (
     <View style={styles.container}>
       <View style={styles.dropdownContainer}>
@@ -116,27 +94,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           </List.Accordion>
         </List.Section>
       </View>
-      {/* <RecyclerListView
-        style={{ width: 300, height: 800 }}
-        layoutProvider={layerProvider}
-        dataProvider={dataProvider}
-        rowRenderer={rowRenderer}
-      ></RecyclerListView> */}
-      {/* {
-        journeys &&
-        <FlatList data ={journeys}
-        renderItem={({item}) =>  
-        <View style = {styles.item}>      
-          <Text style={styles.text}>Departs: {new Date(item.departureTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
-          <Text style={styles.text}>Arrives: {new Date(item.arrivalTime).toLocaleTimeString('en-GB', { timeStyle: 'short' })}</Text>
-          <Text style={styles.text}>{item.journeyDurationInMinutes} Minutes</Text>
-          {item.tickets.map((ticket) => {
-             return <Text style={styles.text}>{ticket.name} £{ticket.priceInPennies/100}</Text>
-          })}
-
-        </View> }
-      ></FlatList>
-      } */}
 
       <RecycleTestComponent journey={journeys}></RecycleTestComponent>
 
