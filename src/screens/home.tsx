@@ -3,9 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, List } from 'react-native-paper';
 import { TrainInfo } from '../models/trainInfo';
 import { ScreenNavigationProps } from '../routes';
-import RecycleTestComponent from '../components/recycleList';
 import RecycleList from '../components/recycleList';
-//import { DataProvider, LayoutProvider} from 'recyclerlistview';
 
 const styles = StyleSheet.create({
   container: {
