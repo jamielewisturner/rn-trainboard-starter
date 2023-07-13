@@ -9,7 +9,5 @@ export type Journey = {
 }
 export type Ticket = {
   priceInPennies: number;
-  // ticketClass: string;
-  // ticketCategory: string;
   name: string;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Button, List } from 'react-native-paper';
-import { TrainInfo } from '../models/trainInfo';
+import { Journey, TrainInfo } from '../models/trainInfo';
 import { ScreenNavigationProps } from '../routes';
 import RecycleList from '../components/recycleList';
 
@@ -46,7 +46,7 @@ function getUrl(origin: string, dest: string): string {
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [origin, setOrigin] = React.useState('RYS');
   const [dest, setDest] = React.useState('OXF');
-  const [journeys, setJourneys] = React.useState([] as Journey[]);
+  const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest), {
@@ -95,7 +95,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       </View>
 
       {
-        //Render if list non-empty
         journeys.length > 0 && <RecycleList journeys={journeys}></RecycleList>
       }
 
