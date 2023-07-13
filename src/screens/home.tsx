@@ -1,9 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, FlatList } from 'react-native';
-import { Text, Button, List } from 'react-native-paper';
-import { TrainInfo, Journey } from '../models/trainInfo';
+import { Text, Button, List, Searchbar } from 'react-native-paper';
+import { TrainInfo, Journey, Station } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
+import StationSearch from '../components/StationSearch';
 
 const styles = StyleSheet.create({
   container: {
@@ -20,7 +21,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dropdownContainer: {
-    flexDirection: 'row',
+    flexDirection: 'col',
   },
   timeDatePicker: {
     flexDirection: 'row',
@@ -43,7 +44,9 @@ function getUrl(origin: string, dest: string, depDate: Date): string {
   if (!process.env.API_URL) {
     throw 'Missing env variable for API_URL';
   }
-  return `${process.env.API_URL}?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=${depDate.toJSON()}`;
+  return `${
+    process.env.API_URL
+  }?originStation=${origin}&destinationStation=${dest}&numberOfAdults=1&numberOfChildren=0&outboundDateTime=${depDate.toJSON()}`;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
@@ -53,7 +56,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
-  const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
+  //const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const getTrainInfo = async () => {
     const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
       method: 'GET',
@@ -95,36 +98,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.dropdownContainer}>
-        <List.Section title="Origin">
-          <List.Accordion title={origin} style={styles.dropdown}>
-            {stations.map((station) => {
-              return (
-                <List.Item
-                  title={station}
-                  key={station}
-                  onPress={() => {
-                    setOrigin(station);
-                  }}
-                />
-              );
-            })}
-          </List.Accordion>
-        </List.Section>
-        <List.Section title="Destination">
-          <List.Accordion title={dest} style={styles.dropdown}>
-            {stations.map((station) => {
-              return (
-                <List.Item
-                  title={station}
-                  key={station}
-                  onPress={() => {
-                    setDest(station);
-                  }}
-                />
-              );
-            })}
-          </List.Accordion>
-        </List.Section>
+      <StationSearch title="Select Origin" result={origin}></StationSearch>
+      <StationSearch title="Select Destination" result={dest}></StationSearch>
       </View>
       <View style={styles.timeDatePicker}>
         <Button onPress={() => setTimePickerVisible(true)}>
