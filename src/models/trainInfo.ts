@@ -11,3 +11,7 @@ export type Ticket = {
   priceInPennies: number;
   name: string;
 }
+export type Station = {
+  name: string;
+  crs: string;
+}
