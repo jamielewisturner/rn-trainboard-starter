@@ -30,4 +30,5 @@ export type Location = {
 };
 export type Operator = {
   name: string;
+  code: string;
 };
