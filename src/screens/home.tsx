@@ -249,7 +249,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           renderItem={({ item }) => (
             <Button
               style={styles.journeyBriefInfo}
-              onPress={() => navigation.navigate('Details')}
+              onPress={() => {
+                navigation.navigate('Details', { journey: item });
+              }}
               mode="contained"
             >
               <View style={styles.journeyBriefInfo}>
@@ -266,15 +268,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   })}
                 </Text>
                 <Text style={styles.journeyInfoText}>
-                  {item.journeyDurationInMinutes} Minutes
+                  Duration: {item.journeyDurationInMinutes} Minutes
                 </Text>
-                {item.tickets.map((ticket) => {
-                  return (
-                    <Text key={ticket.name} style={styles.journeyInfoText}>
-                      {ticket.name} £{ticket.priceInPennies / 100}
-                    </Text>
-                  );
-                })}
+                
+                <Text key={item.tickets[0].name} style={styles.journeyInfoText}>
+                  {item.tickets[0].name} £{item.tickets[0].priceInPennies / 100}
+                </Text>
+      
               </View>
             </Button>
           )}
