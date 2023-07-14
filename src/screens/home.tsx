@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, ActivityIndicator } from 'react-native';
 import { Text, Button, List } from 'react-native-paper';
-import { TrainInfo, Journey } from '../models/trainInfo';
+import { TrainInfo, Journey, Ticket } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
 import StationSearch from '../components/StationSearch';
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     color: '#c8c8a9',
   },
   dropdownContainer: {
-    flexDirection: 'row',
+    flexDirection: 'col',
     paddingLeft: 5,
     paddingRight: 5,
     paddingBottom: 10,
@@ -76,14 +76,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#fc9d9a',
     width: 300,
     marginBottom: 10,
-    marginTop: 10,
     borderRadius: 10,
-    //paddingLeft: 0,
+    flexDirection: 'column',
   },
-  journeyInfoText: {
-    paddingBottom: 8,
+  timeInfo: {
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    width: 250,
+    paddingBottom: 6,
+  },
+  departureTimes: {
     //paddingTop: 10,
-    fontSize: 12,
+    fontSize: 22,
+  },
+  cost: {
+    paddingTop: 4,
+    fontSize: 20,
   },
 });
 
@@ -109,7 +118,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [timePickerVisible, setTimePickerVisible] = React.useState(false);
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
-  const stations = ['SOU', 'RYS', 'OXF', 'RDG', 'WRW'];
   const [loading, setLoading] = React.useState(false);
 
   const getTrainInfo = async () => {
@@ -152,41 +160,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setDatePickerVisible(false);
   };
 
+  const currencyFormatter = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+  });
+
+  function getCheapestTicket(tickets: Ticket[]): Ticket {
+    return tickets.reduce(
+      (cheapest, current) =>
+        current.priceInPennies < cheapest.priceInPennies ? current : cheapest,
+      tickets[0],
+    );
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.dropdownContainer}>
-        <List.Section style={styles.singleDropdown}>
-          <Text style={styles.headerText}>Origin</Text>
-          <List.Accordion title={origin} style={styles.dropdown}>
-            {stations.map((station) => {
-              return (
-                <List.Item
-                  title={station}
-                  key={station}
-                  onPress={() => {
-                    setOrigin(station);
-                  }}
-                />
-              );
-            })}
-          </List.Accordion>
-        </List.Section>
-        <List.Section style={styles.singleDropdown}>
-          <Text style={styles.headerText}>Destination</Text>
-          <List.Accordion title={dest} style={styles.dropdown}>
-            {stations.map((station) => {
-              return (
-                <List.Item
-                  title={station}
-                  key={station}
-                  onPress={() => {
-                    setDest(station);
-                  }}
-                />
-              );
-            })}
-          </List.Accordion>
-        </List.Section>
         <StationSearch
           title="Select Origin"
           setTarget={setOrigin}
@@ -253,6 +242,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {loading && (
         <ActivityIndicator size="large" color="#fe4365"></ActivityIndicator>
       )}
+     
       {journeys && (
         <FlatList
           data={journeys}
@@ -264,33 +254,40 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               }}
               mode="contained"
             >
-              <View style={styles.journeyBriefInfo}>
-                <Text style={styles.journeyInfoText}>
-                  Departs:{' '}
-                  {new Date(item.departureTime).toLocaleTimeString('en-GB', {
-                    timeStyle: 'short',
-                  })}
-                </Text>
-                <Text style={styles.journeyInfoText}>
-                  Arrives:{' '}
-                  {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
-                    timeStyle: 'short',
-                  })}
-                </Text>
-                <Text style={styles.journeyInfoText}>
-                  Duration: {item.journeyDurationInMinutes} Minutes
-                </Text>
-                
-                <Text key={item.tickets[0].name} style={styles.journeyInfoText}>
-                  {item.tickets[0].name} £{item.tickets[0].priceInPennies / 100}
-                </Text>
-      
+              <View>
+                <View style={styles.timeInfo}>
+                  <Text style={styles.departureTimes}>
+                    {new Date(item.departureTime).toLocaleTimeString('en-GB', {
+                      timeStyle: 'short',
+                    })}
+                    {' 🡆 '}
+                    {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
+                      timeStyle: 'short',
+                    })}
+                  </Text>
+                  <Text style={styles.cost}>
+                    {currencyFormatter.format(
+                      getCheapestTicket(item.tickets).priceInPennies / 100,
+                    )}
+                  </Text>
+                </View>
+                <View style={styles.timeInfo}>
+                  <Text>{item.journeyDurationInMinutes} mins</Text>
+                  <Text>
+                    {item.legs.length == 1
+                      ? 'Direct'
+                      : `${item.legs.length - 1} Change${item.legs.length > 2 ? 's' : '' }`}
+                  </Text>
+                  <Text>
+                    {item.status == 'normal' ? 'On-Time' : item.status}
+                  </Text>
+                </View>
+                <Text>{`Towards ${item.legs[0].destination.displayName}`}</Text>
               </View>
             </Button>
           )}
         ></FlatList>
       )}
-      <Text>{dest}</Text>
       <Button style={styles.button} onPress={getTrainInfo}>
         Plan your journey
       </Button>
