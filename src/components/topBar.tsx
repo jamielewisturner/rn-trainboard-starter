@@ -27,7 +27,7 @@ const TopBar: React.FC<TopBarProps> = ({ navigation, progress }) => (
           onPress={navigation.goBack}
         />
       )}
-      <Appbar.Content titleStyle={styles.title} title="Train Board" />
+      <Appbar.Content titleStyle={styles.title} title="Choo-Choo Time" />
     </Appbar.Header>
   </Pressable>
 );
