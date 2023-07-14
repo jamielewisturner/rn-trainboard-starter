@@ -293,7 +293,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {loading && (
         <ActivityIndicator size="large" color="#fe4365"></ActivityIndicator>
       )}
-      {journeys && (
+      {journeys.length > 0 && (
         <FlatList
           data={journeys}
           renderItem={({ item }) => (
