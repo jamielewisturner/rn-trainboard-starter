@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Image } from 'react-native';
-import { Button, Text, Divider } from 'react-native-paper';
+import { StyleSheet, View, Image, FlatList } from 'react-native';
+import { Text, Divider } from 'react-native-paper';
 import { ScreenNavigationProps } from '../routes';
 import { Journey } from '../models/trainInfo';
 
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     padding: 5,
+    marginTop: 20,
   },
   locationAndTime: {
     flexDirection: 'row',
@@ -179,24 +180,28 @@ const DetailsScreen: React.FC<DetailScreenProps> = ({ navigation, route }) => {
           return (
             <View key={ticket.name} style={styles.ticketInfoBox}>
               <Text style={styles.ticketDescription}> {ticket.name} </Text>
-              <Text style={styles.ticketPrice}> {currencyFormatter.format(ticket.priceInPennies / 100)} </Text>
+              <Text style={styles.ticketPrice}>
+                {' '}
+                {currencyFormatter.format(ticket.priceInPennies / 100)}{' '}
+              </Text>
             </View>
           );
         })}
       </View>
 
-      <View>
-        {journey.legs.map((leg) => {
-          if (leg.mode == 'TRAIN') {
+      <FlatList
+        data={journey.legs}
+        renderItem={({ item }) => {
+          if (item.mode == 'TRAIN') {
             return (
-              <View style={styles.legInfo} key={leg.origin.crs}>
+              <View style={styles.legInfo} key={item.origin.crs}>
                 <View style={styles.locationAndTime}>
                   <Text style={styles.locationText}>
                     {' '}
-                    {leg.origin.displayName}{' '}
+                    {item.origin.displayName}{' '}
                   </Text>
                   <Text style={styles.timeText}>
-                    {new Date(leg.departureDateTime).toLocaleTimeString(
+                    {new Date(item.departureDateTime).toLocaleTimeString(
                       'en-GB',
                       {
                         timeStyle: 'short',
@@ -206,7 +211,7 @@ const DetailsScreen: React.FC<DetailScreenProps> = ({ navigation, route }) => {
                 </View>
                 <View style={styles.arrowTimeMode}>
                   <Text style={styles.arrowTextLeft}>
-                    {leg.trainOperator.code}
+                    {item.trainOperator.code}
                   </Text>
                   <Divider />
                   <Image
@@ -216,17 +221,17 @@ const DetailsScreen: React.FC<DetailScreenProps> = ({ navigation, route }) => {
                   />
                   <Divider />
                   <Text style={styles.arrowTextRight}>
-                    {toHourMins(leg.durationInMinutes)}
+                    {toHourMins(item.durationInMinutes)}
                   </Text>
                 </View>
 
                 <View style={styles.locationAndTime}>
                   <Text style={styles.locationText}>
                     {' '}
-                    {leg.destination.displayName}{' '}
+                    {item.destination.displayName}{' '}
                   </Text>
                   <Text style={styles.timeText}>
-                    {new Date(leg.arrivalDateTime).toLocaleTimeString('en-GB', {
+                    {new Date(item.arrivalDateTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
                     })}
                   </Text>
@@ -235,15 +240,15 @@ const DetailsScreen: React.FC<DetailScreenProps> = ({ navigation, route }) => {
             );
           } else {
             return (
-              <View style={styles.legInfo} key={leg.origin.crs}>
+              <View style={styles.legInfo} key={item.origin.crs}>
                 <View style={styles.locationAndTime}>
                   <Text style={styles.locationText}>
                     {' '}
-                    {leg.origin.displayName}{' '}
+                    {item.origin.displayName}{' '}
                   </Text>
                 </View>
                 <View style={styles.arrowTimeMode}>
-                  <Text style={styles.arrowTextLeft}>{leg.mode}</Text>
+                  <Text style={styles.arrowTextLeft}>{item.mode}</Text>
                   <Divider />
                   <Image
                     source={require('./arrow.png')}
@@ -252,20 +257,20 @@ const DetailsScreen: React.FC<DetailScreenProps> = ({ navigation, route }) => {
                   />
                   <Divider />
                   <Text style={styles.arrowTextRight}>
-                    {toHourMins(leg.durationInMinutes)}
+                    {toHourMins(item.durationInMinutes)}
                   </Text>
                 </View>
                 <View style={styles.locationAndTime}>
                   <Text style={styles.locationText}>
                     {' '}
-                    {leg.destination.displayName}{' '}
+                    {item.destination.displayName}{' '}
                   </Text>
                 </View>
               </View>
             );
-          }
-        })}
-      </View>
+          } //end of else
+        }}
+      ></FlatList>
     </View>
   );
 };

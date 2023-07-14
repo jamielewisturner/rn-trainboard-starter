@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     paddingRight: 5,
     paddingBottom: 10,
+    paddingTop: 20,
     color: '#c8c8a9',
   },
   singleTimeDate: {
@@ -190,9 +191,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Button
             style={styles.pickTimeButton}
             onPress={() => setTimePickerVisible(true)}
-            mode="outlined"
+            mode="contained"
             compact={true}
-            color="#111"
+            color="#83af9b"
           >
             Departure time
           </Button>
@@ -213,9 +214,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Button
             style={styles.pickTimeButton}
             onPress={() => setDatePickerVisible(true)}
-            mode="outlined"
+            mode="contained"
             compact={true}
-            color="#111"
+            color="#83af9b"
           >
             Departure date
           </Button>
