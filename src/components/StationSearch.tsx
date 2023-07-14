@@ -9,6 +9,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'column',
     margin: 10,
+    alignContent: 'center',
+    width: '95%',
   },
   item: {
     textAlign: 'center',
@@ -16,7 +18,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
   },
 });
 
@@ -53,9 +54,9 @@ const StationSearch: React.FC<StationSearchProps> = ({ title, setTarget }) => {
         value={searchQuery}
         onFocus={() => setIsSearching(true)}
       ></Searchbar>
-      <List.Section>
-        {isSearching &&
-          stations.map((station) => {
+      {isSearching && searchQuery.length > 0 && (
+        <List.Section style={{ width: 200 }}>
+          {stations.map((station) => {
             return (
               <List.Item
                 title={station.name}
@@ -69,10 +70,15 @@ const StationSearch: React.FC<StationSearchProps> = ({ title, setTarget }) => {
               />
             );
           })}
-        {isSearching && stations.length == 0 && searchQuery.length > 0 && (
-          <List.Item title="No stations found" key="NoStations" />
-        )}
-      </List.Section>
+          {stations.length == 0 && (
+            <List.Item
+              titleStyle={styles.item}
+              title="No stations found"
+              key="NoStations"
+            />
+          )}
+        </List.Section>
+      )}
     </View>
   );
 };

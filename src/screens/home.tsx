@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, ActivityIndicator } from 'react-native';
-import { Text, Button, List } from 'react-native-paper';
+import { Text, Button, Snackbar } from 'react-native-paper';
 import { TrainInfo, Journey, Ticket } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
@@ -11,18 +11,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#c8c8a9',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   text: {
     paddingBottom: 24,
-    //paddingTop: 10,
     fontSize: 15,
   },
   headerText: {
     textAlign: 'center',
-    // color: '#fe4365',
-    //paddingLeft: 20,
-    //paddingRight: 5,
     fontSize: 20,
     paddingBottom: 10,
     paddingTop: 10,
@@ -32,7 +27,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#83af9b',
     color: '#000',
-    //borderRadius: 15,
     overflow: 'hidden',
     backfaceVisibility: 'hidden',
   },
@@ -95,6 +89,11 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     fontSize: 20,
   },
+  moreTrains: {
+    marginBottom: 28,
+    marginTop: 10,
+    fontSize: 20,
+  }
 });
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
@@ -120,18 +119,70 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [snackbarMsg, setSnackbar] = React.useState('');
+  const [offset, setOffset] = React.useState(0);
+
+
+  const getMoreTrains = async () => {
+    setLoading(true);
+    
+    console.log(offset);
+    const res = await fetch(
+      getUrl(
+        origin,
+        dest,
+        new Date(selectedDepartureDate.getTime() + offset * 30 * 60000),
+      ),
+      {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': process.env.API_KEY,
+        },
+      },
+    );
+
+    setOffset(offset + 1);
+
+   const trainInfo = (await res.json()) as TrainInfo;
+   trainInfo.outboundJourneys.forEach(journey => {
+    if(!journeys.map((journey2)=>journey2.journeyId).includes(journey.journeyId)){
+      journeys.push(journey);
+    }
+   });
+ 
+  setJourneys(journeys);
+  setLoading(false);
+  };
 
   const getTrainInfo = async () => {
     setLoading(true);
+    setOffset(1);
+    //offset =0;
     const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
       method: 'GET',
       headers: {
         'X-API-KEY': process.env.API_KEY,
       },
     });
-    const trainInfo = (await res.json()) as TrainInfo;
+
+    console.log(res.status);
+    if (res.status == 200) {
+      const json = await res.json();
+      const trainInfo = json as TrainInfo;
+
+      setJourneys(trainInfo.outboundJourneys);
+      if (trainInfo.outboundJourneys.length == 0) {
+        setSnackbar(
+          `Cannot find train between ${origin} and ${dest} at the specified time`,
+        );
+      }
+    } else {
+      const resJSON = await res.json();
+
+      console.log(resJSON['error_description']);
+      setSnackbar(resJSON['error_description']);
+    }
     setLoading(false);
-    setJourneys(trainInfo.outboundJourneys);
   };
   const onDismissTimePicker = () => {
     setTimePickerVisible(false);
@@ -243,8 +294,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {loading && (
         <ActivityIndicator size="large" color="#fe4365"></ActivityIndicator>
       )}
-     
-      {journeys && (
+      {journeys.length > 0 && (
         <FlatList
           data={journeys}
           renderItem={({ item }) => (
@@ -260,8 +310,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   <Text style={styles.departureTimes}>
                     {new Date(item.departureTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
-                    })}
-                    {' 🡆 '}
+                    })}{' '}
+                    &#10142;{' '}
                     {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
                     })}
@@ -277,7 +327,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   <Text>
                     {item.legs.length == 1
                       ? 'Direct'
-                      : `${item.legs.length - 1} Change${item.legs.length > 2 ? 's' : '' }`}
+                      : `${item.legs.length - 1} Change${
+                          item.legs.length > 2 ? 's' : ''
+                        }`}
                   </Text>
                   <Text>
                     {item.status == 'normal' ? 'On-Time' : item.status}
@@ -289,6 +341,29 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
+      <Snackbar
+        visible={snackbarMsg.length > 0}
+        onDismiss={() => {
+          setSnackbar('');
+        }}
+        action={{
+          label: 'Okay',
+          onPress: () => {
+            // Do something
+          },
+        }}
+      >
+        {snackbarMsg}
+      </Snackbar>
+      <Button style={styles.moreTrains}
+        
+        onPress={getMoreTrains}
+        mode="contained"
+        disabled={offset < 1}
+      >
+        Load more trains
+      </Button>
+
     </View>
   );
 };
