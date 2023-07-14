@@ -30,6 +30,7 @@ export type Location = {
 };
 export type Operator = {
   name: string;
+  code: string;
 };
 export type Station = {
   name: string;
