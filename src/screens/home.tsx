@@ -288,9 +288,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
-      <Button style={styles.button} onPress={getTrainInfo}>
-        Plan your journey
-      </Button>
     </View>
   );
 };
