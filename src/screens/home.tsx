@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, ActivityIndicator } from 'react-native';
-import { Text, Button, List } from 'react-native-paper';
+import { Text, Button, Snackbar } from 'react-native-paper';
 import { TrainInfo, Journey, Ticket } from '../models/trainInfo';
 import { TimePickerModal, DatePickerModal } from 'react-native-paper-dates';
 import { ScreenNavigationProps } from '../routes';
@@ -113,6 +113,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [datePickerVisible, setDatePickerVisible] = React.useState(false);
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [snackbarMsg, setSnackbar] = React.useState('');
 
   const getTrainInfo = async () => {
     setLoading(true);
@@ -122,9 +123,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         'X-API-KEY': process.env.API_KEY,
       },
     });
-    const trainInfo = (await res.json()) as TrainInfo;
+    
+    console.log(res.status);
+    if (res.status == 200) {
+      const json = (await res.json());
+      const trainInfo = json as TrainInfo;
+      
+      setJourneys(trainInfo.outboundJourneys);
+      if (trainInfo.outboundJourneys.length == 0){
+        setSnackbar(`Cannot find train between ${origin} and ${dest} at the specified time`);
+      } 
+    }else{
+      const resJSON = await res.json();
+      
+      console.log(resJSON["error_description"]);
+      setSnackbar(resJSON["error_description"]);
+    }
     setLoading(false);
-    setJourneys(trainInfo.outboundJourneys);
   };
   const onDismissTimePicker = () => {
     setTimePickerVisible(false);
@@ -253,7 +268,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                     {new Date(item.departureTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
                     })}
-                    {' 🡆 '}
+                    {' '}
+                    &#10142;
+                    {' '}
                     {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
                     })}
@@ -281,7 +298,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
-
+      <Snackbar
+        visible={snackbarMsg.length > 0}
+        onDismiss={()=>{setSnackbar('')}}
+        action={{
+          label: 'Okay',
+          onPress: () => {
+            // Do something
+          },
+        }}>
+        {snackbarMsg}
+      </Snackbar>
     </View>
   );
 };
