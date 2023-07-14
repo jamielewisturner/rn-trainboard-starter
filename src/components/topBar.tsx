@@ -1,6 +1,6 @@
 import { StackHeaderProps } from '@react-navigation/stack';
 import React from 'react';
-import { StyleSheet, Pressable } from 'react-native';
+import { StyleSheet, Pressable, Image } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
 type TopBarProps = StackHeaderProps;
