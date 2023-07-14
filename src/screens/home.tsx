@@ -11,18 +11,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#c8c8a9',
     alignItems: 'center',
-    justifyContent: 'center',
   },
   text: {
     paddingBottom: 24,
-    //paddingTop: 10,
     fontSize: 15,
   },
   headerText: {
     textAlign: 'center',
-    // color: '#fe4365',
-    //paddingLeft: 20,
-    //paddingRight: 5,
     fontSize: 20,
     paddingBottom: 10,
     paddingTop: 10,
@@ -32,7 +27,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#83af9b',
     color: '#000',
-    //borderRadius: 15,
     overflow: 'hidden',
     backfaceVisibility: 'hidden',
   },
@@ -242,7 +236,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       {loading && (
         <ActivityIndicator size="large" color="#fe4365"></ActivityIndicator>
       )}
-     
       {journeys && (
         <FlatList
           data={journeys}
@@ -288,9 +281,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           )}
         ></FlatList>
       )}
-      <Button style={styles.button} onPress={getTrainInfo}>
-        Plan your journey
-      </Button>
+
     </View>
   );
 };
