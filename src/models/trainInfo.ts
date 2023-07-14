@@ -10,6 +10,7 @@ export type Journey = {
   tickets: Ticket[];
   legs: Leg[];
   status: string;
+  journeyId: string;
 };
 export type Ticket = {
   priceInPennies: number;

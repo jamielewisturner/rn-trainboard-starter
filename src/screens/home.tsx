@@ -88,6 +88,11 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     fontSize: 20,
   },
+  moreTrains: {
+    marginBottom: 28,
+    marginTop: 10,
+    fontSize: 20,
+  }
 });
 
 type HomeScreenProps = ScreenNavigationProps<'Home'>;
@@ -114,30 +119,67 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [journeys, setJourneys] = React.useState<Journey[]>([]);
   const [loading, setLoading] = React.useState(false);
   const [snackbarMsg, setSnackbar] = React.useState('');
+  const [offset, setOffset] = React.useState(0);
+
+
+  const getMoreTrains = async () => {
+    setLoading(true);
+    
+    console.log(offset);
+    const res = await fetch(
+      getUrl(
+        origin,
+        dest,
+        new Date(selectedDepartureDate.getTime() + offset * 30 * 60000),
+      ),
+      {
+        method: 'GET',
+        headers: {
+          'X-API-KEY': process.env.API_KEY,
+        },
+      },
+    );
+
+    setOffset(offset + 1);
+
+   const trainInfo = (await res.json()) as TrainInfo;
+   trainInfo.outboundJourneys.forEach(journey => {
+    if(!journeys.map((journey2)=>journey2.journeyId).includes(journey.journeyId)){
+      journeys.push(journey);
+    }
+   });
+ 
+  setJourneys(journeys);
+  setLoading(false);
+  };
 
   const getTrainInfo = async () => {
     setLoading(true);
+    setOffset(1);
+    //offset =0;
     const res = await fetch(getUrl(origin, dest, selectedDepartureDate), {
       method: 'GET',
       headers: {
         'X-API-KEY': process.env.API_KEY,
       },
     });
-    
+
     console.log(res.status);
     if (res.status == 200) {
-      const json = (await res.json());
+      const json = await res.json();
       const trainInfo = json as TrainInfo;
-      
+
       setJourneys(trainInfo.outboundJourneys);
-      if (trainInfo.outboundJourneys.length == 0){
-        setSnackbar(`Cannot find train between ${origin} and ${dest} at the specified time`);
-      } 
-    }else{
+      if (trainInfo.outboundJourneys.length == 0) {
+        setSnackbar(
+          `Cannot find train between ${origin} and ${dest} at the specified time`,
+        );
+      }
+    } else {
       const resJSON = await res.json();
-      
-      console.log(resJSON["error_description"]);
-      setSnackbar(resJSON["error_description"]);
+
+      console.log(resJSON['error_description']);
+      setSnackbar(resJSON['error_description']);
     }
     setLoading(false);
   };
@@ -267,10 +309,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   <Text style={styles.departureTimes}>
                     {new Date(item.departureTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
-                    })}
-                    {' '}
-                    &#10142;
-                    {' '}
+                    })}{' '}
+                    &#10142;{' '}
                     {new Date(item.arrivalTime).toLocaleTimeString('en-GB', {
                       timeStyle: 'short',
                     })}
@@ -286,7 +326,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
                   <Text>
                     {item.legs.length == 1
                       ? 'Direct'
-                      : `${item.legs.length - 1} Change${item.legs.length > 2 ? 's' : '' }`}
+                      : `${item.legs.length - 1} Change${
+                          item.legs.length > 2 ? 's' : ''
+                        }`}
                   </Text>
                   <Text>
                     {item.status == 'normal' ? 'On-Time' : item.status}
@@ -300,15 +342,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
       )}
       <Snackbar
         visible={snackbarMsg.length > 0}
-        onDismiss={()=>{setSnackbar('')}}
+        onDismiss={() => {
+          setSnackbar('');
+        }}
         action={{
           label: 'Okay',
           onPress: () => {
             // Do something
           },
-        }}>
+        }}
+      >
         {snackbarMsg}
       </Snackbar>
+      <Button style={styles.moreTrains}
+        
+        onPress={getMoreTrains}
+        mode="contained"
+        disabled={offset < 1}
+      >
+        Load more trains
+      </Button>
+
     </View>
   );
 };
